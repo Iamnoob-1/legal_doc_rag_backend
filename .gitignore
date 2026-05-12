@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+
+# Virtual environment
+venv/
+env/
+.venv/
+ENV/
+
+# Environment variables
+*.env
+.env.*
+!.env.example
+
+# Flask / FastAPI cache
+instance/
+*.log
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Model files (ignored - user installs them separately)
+models/
+*.pt
+*.bin
+*.h5
+*.ckpt
+*.pkl
+
+# Node (if frontend later added)
+node_modules/
+dist/
+build/
+
+# Coverage / Testing
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Docker
+*.pid
+*.seed
+*.pid.lock

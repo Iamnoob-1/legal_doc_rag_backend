@@ -1,0 +1,1 @@
+This is a test document with some legal clauses. It should be ingested.
