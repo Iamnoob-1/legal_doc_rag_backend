@@ -191,10 +191,6 @@ def summarize_section(title: str, text: str) -> str:
 
 
 def summarize_document(path: str) -> Dict[str, str]:
-    """
-    Parse document and generate ONE combined summary request
-    to reduce Gemini API quota usage.
-    """
 
     text = parse_document(path)
 
@@ -202,28 +198,64 @@ def summarize_document(path: str) -> Dict[str, str]:
         return {
             "Error": "No text could be extracted from document."
         }
+    chunks = chunk_text(text)
 
-    # Limit size to avoid token overflow
-    text = text[:12000]
+    if not chunks:
+        return {
+            "Error": "Document chunking failed."
+        }
 
-    prompt = f"""
+    chunk_summaries = []
+
+    # Summarize each chunk
+    for i, chunk in enumerate(chunks):
+
+        if not chunk.strip():
+            continue
+
+        prompt = f"""
+        You are a legal assistant.
+
+        Summarize the following part of a legal/technical document in simple English.
+
+        Requirements:
+        - Use bullet points
+        - Keep explanations short
+        - Highlight important clauses, penalties, risks, obligations, and deadlines
+        - Make it easy for a normal person to understand
+
+        Document Part:
+        {chunk}
+        """
+
+        summary = generate_response(prompt)
+
+        chunk_summaries.append(
+            f"Section {i+1} Summary:\n{summary}"
+        )
+
+    # Combine all chunk summaries
+    combined_summary = "\n\n".join(chunk_summaries)
+
+    # Generate final refined summary
+    final_prompt = f"""
     You are a legal assistant.
 
-    Summarize the following legal/technical document in simple English.
+    Create a final clean and well-structured summary from these section summaries.
 
     Requirements:
-    - Use headings
-    - Use bullet points
-    - Keep explanations short
-    - Highlight important clauses, penalties, responsibilities, risks, and deadlines
-    - Make it easy for a normal person to understand
+    - Organize clearly
+    - Remove repetition
+    - Keep important legal risks and obligations
+    - Use simple English
+    - Use headings and bullet points
 
-    Document:
-    {text}
+    Section Summaries:
+    {combined_summary}
     """
 
-    response = generate_response(prompt)
+    final_summary = generate_response(final_prompt)
 
     return {
-        "AI Summary": response
+        "AI Summary": final_summary
     }
